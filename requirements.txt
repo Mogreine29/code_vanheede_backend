@@ -1,0 +1,14 @@
+Django==3.2.9
+mysqlclient==2.1.0
+django-mysql==3.8.1
+djangorestframework==3.12.4
+mysql-connector-python == 8.0.27
+django-cors-headers == 3.11.0
+pandas
+sklearn
+matplotlib
+folium
+k_means_constrained
+ortools
+holidays
+gunicorn

@@ -1,0 +1,15 @@
+{
+  "Depot": "Dottignies",
+  "Vidange": "Dottignies",
+  "Max time": 39600,
+  "Number of weeks" : 10,
+  "Number of days" :5,
+  "26 Tonnes" : 1,
+  "44 Tonnes" : 1,
+  "Spikes remplissage" : 0,
+  "Remplissage limite" : 0.75,
+  "Remplissage limite camions" :"auto",
+  "Mode camions adaptatifs": 0,
+  "urgent_bins": [],
+  "date_debut": "2023-01-02"
+}
