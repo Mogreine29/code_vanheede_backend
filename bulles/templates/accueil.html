@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+    <title>Accueil</title>
+
+	<!-- Vue.js lien vers le -->
+	<!-- Version développement. Celle-ci donne des avertissements utiles sur la console
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+	ou :
+	Version production. celle-ci est optimisée pour la taille et la vitesse
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>-->
+    
+	<!-- Explication global de ce qu'est vue.js : https://fr.tuto.com/blog/2020/12/vue-js.htm: / lien pour un tutoriel de départ : https://fr.vuejs.org/v2/guide/index.html-->
+    
+	<!-- Vue.js lien vers le fichier js (framework évolutif) -->
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+    <!-- Attention : call JQUERY BEFORE BOOTSTRAP -->
+    <!--  jQuery lien vers le fichier js herbergé en ligne-->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+	<!-- Bootstrap lien vers le fichier CSS minifié hébergé sur BootstrapCDN.-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+	<!-- Bootstrap lien vers le fichier js minifié hébergé sur cbnjs.-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+	
+	<!-- Bootstrap lien vers le fichier css minifié hébergé sur cbnjs.-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+
+	<!-- Isolated Version of Bootstrap, not needed if your site already uses Bootstrap -->
+	<!-- <link rel="stylesheet" href="https://formden.com/static/cdn/bootstrap-iso.css" /> -->
+	
+	<!-- Lien vers les fichier css pour le design du site -->
+	<link rel="stylesheet" href="{%static 'css/accueil.css' %}"/>
+    <link rel="stylesheet" href="{%static 'css/navbar.css' %}"/>
+
+    <!-- Global variable : ONSERVER -->
+    <script type="text/javascript" src="{%static 'js/global.js' %}"></script> 
+
+    <!-- Shortcut icon -->
+    <link rel="shortcut icon" href="{%static 'images/Icon_Vanheede.png' %}"/>
+</head>
+<body>
+    <!-- Barre de navigation avec Bootstrap -->
+    <nav class = "white" id="navbar"> 
+        <a href={%url 'accueil'%} class="link-img"><img class="logo logo-vanheede" src="{%static 'images/logo_Vanheede.png' %}" alt="logo"></a>
+             
+        <ul class="nav-links">
+            <li><a href={%url 'accueil'%} class="actual-page-link" id="link-1">Accueil</a></li>
+            <li><a href={%url 'site'%} class="other-page-link" id="link-4">Sites et bulles</a></li>
+            <li><a href={%url 'simulation'%} class="other-page-link" id="link-5">Simulations</a></li>
+            <li><a href={%url 'tournees'%} class="other-page-link" id="link-6">Tournées</a></li>
+        </ul>
+        
+        <img class="logo logo-umons" src="{%static 'images/logo_Umons.png' %}" alt="logo">
+        <div class="burger">
+            <div class="line1"></div>
+            <div class="line2"></div>
+            <div class="line3"></div>
+        </div>
+    </nav>
+
+    <content id ="app">
+	    <!-- Formulaire où l'on selectionne tous les paramètres pour la simulation -->
+        <form class="formulaire" method="POST">
+            <!-- Form title -->
+            <div class= "Titre">
+                <h2 class="titre"> Paramètres de la simulation </h2>
+            </div>
+
+            <!-- Simulation settings -->
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label class= "set-param" title="veuillez choisir le set de paramètres">Set de paramètres</label><br>
+                </div>
+                <div class="col">
+                    <select  class="form-control" name="param" size="1" @change="fetchParam($event)">
+                        <option value="" disabled selected hidden>Choisissez un set</option>
+						<!-- v-for : afficher une liste d’éléments en provenance d’un tableau de données lié au fichié index.js -->
+                        <option v-for="paramSet in paramSets.slice().reverse()" :value=paramSet.id> [[paramSet.Nom]] </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label title="Maximum 30 caractères">Nom</label>
+                </div>
+                <div class="col">
+                    <input class="form-control" type="text" id="Nom" placeholder="Nom de la simulation" v-model=selectedParams.Nom required>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <span>Dépôt</span>
+                </div>
+                <div class="col">
+                    <select class="form-control" @change="changeDepot" v-model="selectedDepot" id='depot' required>
+                        <option value="Quévy">Quévy</option>
+                        <option value="Dottignies">Dottignies</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <span>Lieu de vidange</span>
+                </div>
+                <div class="col">
+                    <select class="form-control" v-model="selectedVidange" id='vidange' v-html="optionsList" required></select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label title="veuillez choisir le nombre de jours par semaine de la simulation"> Nombre de jours/semaine</label>
+                </div>
+                <div class="col">
+                     <input class="form-control" type="number" id="jours" min="1" required v-model=selectedParams.days>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label> Nombre de semaines</label>
+                </div>
+                <div class="col">
+                <input class="form-control" type="number" id="semaine" min="1" required v-model=selectedParams.weeks>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label title="Veuillez choisir une date après la dernière vidange"> Date de début</label>
+                </div>
+                <div class="col">
+                <input class="form-control" type="date" id="date-debut" required v-model=selectedParams.firstDay >
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label>Nombre de camions 26 tonnes</label>
+                </div>
+                <div class="col">
+                    <input class="form-control" type="number" id="petit" min="0" required v-model=selectedParams.petit>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label>Nombre de camions 44 tonnes</label>
+                </div>
+
+                <div class="col">
+                    <input class="form-control" type="number" id="grand" min="0" required v-model=selectedParams.grand>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label title="veuillez choisir le temps maximum par jour d'une tournée">Temps max (en heure)</label>
+                </div>
+                <div class="col">
+                    <input class="form-control" type="number" id="temps" min="0" required v-model=selectedParams.Maxtime>
+                </div>
+            </div>
+
+            <div class="form-group row" style="display: none;">
+                <div class="col my-auto">
+                    <label title="Le mode remplissages aléatoires et capteur correspond à ...">Mode remplissages aléatoires et capteur</label> <!--A compléter-->
+                </div>
+                <div class="col">
+                    <select class="form-control" id='spike' required v-model=selectedParams.spike>
+                    <option value="Désactivé" selected>Désactivé</option>
+                    <option value="Activé" disabled>Activé</option>
+                </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label title="veuillez choisir le pourcentage de remplissage des bulles lors des tournées">Limite de remplissage des bulles</label>
+                </div>
+                <div class="col">
+                    <input class="form-control" type="number" step=".01" id="remplissage"  min="0" max="1" required v-model=selectedParams.remplissage>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col my-auto">
+                    <label title="veuillez choisir le pourcentage de remplissage des camions lors des tournées">Pourcentage maximum de remplissage des camions</label>
+                </div>
+                <div class="col">
+                    <input class="form-control" id="remplissage-truck" required v-model=selectedParams.remplissageCamions>
+                </div>
+            </div>
+			<div class="form-group row" style="display: none;">
+                <div class="col my-auto">
+                    <label title="veuillez choisir l'adaptation des camions en fonction de la quantité à ramasser">Mode camion adaptatifs</label>
+                </div>
+                <div class="col">
+                    <select class="form-control" class="form-control" id='mode' required v-model=selectedParams.mode>
+                        <option value="Désactivé">Désactivé</option>
+                        <option value="Activé" selected>Activé</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row text-center mt-5">
+                <button id='button' class="btn" for="Bouton" v-on:click="RunSimulation" >
+					<section class="portfolio-experiment">
+						<a>
+							<span class="text">Lancement de la simulation</span>
+							<span class="line -right"></span>
+							<span class="line -top"></span>
+							<span class="line -left"></span>
+							<span class="line -bottom"></span>
+						</a>
+					</section>
+				</button>
+				<img id = 'gif_button_simulation' class="gif_button_simulation form-group" src="{%static 'images/Bulle_a_verre.gif' %}"></img>
+			</div>
+        </form>
+
+        <!-- Previous simulations -->
+        <div class="image">
+            <div>
+                <h2 class="titre"> Vos simulations précédentes </h2>
+            </div>
+            <template class="simulation-grid">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr v-for="simulation in simulations">
+                            <td class="simu-link" @click="viewSimulation(simulation)" style="font-weight:bold">[[simulation.nom]]</td>
+                            <td class="button-delete" @click="deleteSimulation(simulation)"><img src="{%static 'images/delete.png' %}" width="20vh"title="Supprimer la simulation"></td>                        </tr>
+                    </tbody>
+                </table>
+
+            </template>
+        </div>
+		<a href="#" class="to-top">Back to top</a>
+		
+    </content>
+	
+    <script src="{%static 'js/nav.js' %}"></script>
+    <script src="{%static 'js/accueil.js' %}"></script>
+</body>
+
+</html>

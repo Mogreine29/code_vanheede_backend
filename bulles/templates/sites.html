@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+	<head>
+	    <meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Sites</title>
+		<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+		
+		<link href="https://code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css" rel="stylesheet"/>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.js" integrity="sha512-CX7sDOp7UTAq+i1FYIlf9Uo27x4os+kGeoT7rgwvY+4dmjqV0IuE/Bl5hVsjnQPQiTOhAX1O2r2j5bjsFBvv/A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+		
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		
+		<!-- Style CSS -->
+		<link rel="stylesheet" href="{%static 'css/navbar.css' %}" />
+		<link rel="stylesheet" href="{%static 'css/bulles.css' %}" />
+
+		<!-- Global variable : onServer -->
+		<script type="text/javascript" src="{%static 'js/global.js' %}"></script> 
+
+		<!-- Shortcut icon -->
+		<link rel="shortcut icon" href="{%static 'images/Icon_Vanheede.png' %}" />
+	</head>
+<body>
+	
+	<nav class = "white" id="navbar">
+		<!-- Logo VANHEEDE -->
+		<a href={%url 'accueil'%} class="link-img"><img class="logo logo-vanheede" src="{%static 'images/logo_Vanheede.png' %}" alt="logo"></a>
+		
+		<!-- Navbar -->
+		<ul class="nav-links">
+			<li><a href={%url 'accueil'%} class="other-page-link" id="link-1">Accueil</a></li>
+			<li><a href={%url 'site'%} class="actual-page-link" id="link-4">Sites et bulles</a></li>
+			<li><a href={%url 'simulation'%} class="other-page-link" id="link-5">Simulations</a></li>
+            <li><a href={%url 'tournees'%}  class="other-page-link" id="link-6">Tournées</a></li>
+		</ul>
+		
+		<!-- Logo UMONS -->
+		<img class="logo logo-umons" src="{%static 'images/logo_Umons.png' %}" alt="logo">
+
+		<!-- Burger for mobile menu -->
+		<div class="burger">
+			<div class="line1"></div>
+			<div class="line2"></div>
+			<div class="line3"></div>
+		</div>
+	</nav>
+	
+	<content>
+		<div id="app">
+			<!-- Section for the update of the actual emptying dates of the sites and/or bottle banks (?) -->
+				
+			
+			{% if submitted %}
+				Your site was submitted successfully!
+			{% endif %}
+				
+			<div class="flexed" style="margin-left: 30vh; margin-right: 30vh; margin-top: 5vh;">
+			<div>
+			<input v-model="searchKey_S" type="text" class="search-bar" id="search_S" placeholder="Rechercher..." autocomplete="off">
+			</div>
+			
+			<div id="switch" style="left:0">
+				<img src="{%static 'images/bulle.png' %}" width="60vh" height="60vh">
+				<div class="form-check form-switch form-switch-lg" style="margin-top: 2.2vh; margin-left: 2vh; margin-right: 2vh;" v-on:click="switchSitesBulles" title="changement entre les bulles et les sites">
+				  
+				  <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
+				  <label class="form-check-label" for="flexSwitchCheckChecked"></label>
+				</div>
+				<img src="{%static 'images/place.png' %}" width="60vh" height="60vh">
+			</div>
+
+			</div>
+	
+			<div class="sites-wrapper white">
+				<div class="sites-grid" id="sites-grid-title">
+					<div class="sites-title">NOM</div>
+					<div class="sites-title">LONGITUDE</div>
+					<div class="sites-title">LATITUDE</div>
+					<!-- <div class="sites-title">VITESSE DE REMPLISSAGE COLORE (KG/JOUR)</div>
+					<div class="sites-title">VITESSE DE REMPLISSAGE BLANC (KG/JOUR)</div> -->
+					<div class="sites-title">TYPE DE SITE</div>
+					<div class="sites-title">NOMBRE DE BULLES</div>
+					<div class="sites-title"></div>
+					<div class="sites-title"></div>
+					<button id='button' class="btn" for="Bouton"  data-toggle="modal" data-target="#myModal" > 
+						<section>
+						<img src="{%static 'images/plus.png' %}" width="20vh" title="ajout de sites">
+						</section>
+					</button>
+					
+				</div>
+				
+				<div class="sites-grid" id="sites-grid-content" @load= "fetchBulles_Sites"  v-for="(site) in filteredList_S" :key = "site.id_site" v-bind:keyid="site.id_site">
+					<p style="display: none;">[[site.id_site]]</p>
+					<div class="sites-data">[[site.nom]]</div>
+					<div class="sites-data">[[site.longitude]]</div>
+					<div class="sites-data">[[site.latitude]]</div>
+					<!-- <div class="sites-data">[[site.vitesse_c.toFixed(1)]] </div>
+					<div class="sites-data">[[site.vitesse_b.toFixed(1)]]</div> -->
+					<div class="sites-data">[[site.type_site]] </div>
+					<div class="sites-data">[[site.nombre_bulles]]</div>
+					<!-- Affichage des bulles du site -->
+					<button class="button-delete" onclick="afficherBulles(this)" :id="site.nom" v-bind:keyid="site.id_site"><img src="{%static 'images/search.png' %}" width="20vh"title="voir les bulles associées aux sites"></button>
+					<!-- Modification de sites -->
+					<button class="button-edit" data-toggle="modal" data-target="#myModal2"  v-on:click="editsite(site.id_site)" class="sites-data-edit"><img src="{%static 'images/edit.png' %}" width="20vh" title="modifier le site"></button>
+					<!-- Suppression de sites -->
+					<button class="button-delete" v-on:click="suppsite(site.nom,site.id_site)" class="sites-data supprimer-data" ><img src="{%static 'images/delete.png' %}" width="20vh" title="supprimer un site"></button>
+				</div>
+			</div>
+			
+		
+		
+	<!-- Modal -->
+		<div class="modal fade " id="myModal" role="dialog">
+		<div class="modal-dialog modal-lg">
+		
+			<!-- Modal content-->
+			<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Ajout d'un site</h4>
+			</div>
+			<div class="modal-body">
+            <div class="page-connexion ">
+
+				<form class="formulaire" action = "" method=POST>
+					<h3 class="green col-12 margin-bottom"> Paramètres </h3>
+					{{form.as_p}}
+				
+					<input type="submit" value="Ajouter" class="btn margin-top fw-bold connexion-button ">
+				</form>
+			</div> 
+			</div>
+			
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+			</div>
+			</div>
+			</div>
+	
+	<!-- Modal2 -->
+		<div class="modal fade " id="myModal2" role="dialog">
+		<div class="modal-dialog modal-lg">
+		
+			<!-- Modal content-->
+			<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Modification d'un site</h4>
+			</div>
+			<div class="modal-body">
+            <div class="page-connexion ">
+				
+				<form class="formulaire" action = "" method="POST">
+					<h3 class="green col-12 margin-bottom"> Paramètres </h3>
+
+						<p>
+							<label>Nom</label>
+							<input class="form-control2 " type="text" id="Nom_Modif" placeholder="Nom du site" required >
+						</p>
+						
+						<p>
+							<label>Depot</label>
+							<select class="form-control2" id='Id_depot_Modif' required>
+							<option value="Dottignies">Dottignies</option>
+							<option value="Quévy">Quévy</option>
+							</select>
+						</p>
+						
+						<p>
+							<label>Type_site</label>
+							<select class="form-control2" id='Type_site_Modif' required>
+							<option value="Site">Site</option>
+							<option value="Recycle Park">Recycle Park</option>
+							</select>
+						</p>
+						
+						<p>
+							<label>longitude</label>
+							<input class="form-control2" type="number" id="longitude_Modif" placeholder="longitude" step=".0001"required >
+						</p>
+						
+						<p>
+							<label>latitude</label>
+							<input class="form-control2" type="number" id="latitude_Modif" placeholder="latitude" step=".0001"required>
+						</p>
+						
+						<p>
+							<label>date_vidange</label>
+							<input class="form-control2" type="date" id="date_vidange_Modif" placeholder="date_vidange" required>
+						</p>
+
+					<button class="btn fw-bold connexion-button" v-on:click="editsite2" >
+						Modifier
+					</button>
+				</form>
+
+			</div> 
+			</div>
+			
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+			</div>
+		</div>
+		</div>
+		
+	</div>	
+	</content>	
+
+	
+	<script src="{%static 'js/nav.js' %}"></script>
+	<script src="{%static 'js/bulles.js' %}"></script>
+	<script src="{%static 'js/jquery.min.js' %}"></script>
+	<script src="{%static 'js/bootstrap.min.js' %}"></script>
+
+</body>
+</html>

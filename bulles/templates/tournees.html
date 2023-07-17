@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>Tournées</title>
+
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="{%static 'css/style.css' %}">
+    <link rel="stylesheet" href="{%static 'css/navbar.css' %}" />
+	<link rel="stylesheet" href="{%static 'css/tournees.css' %}" />
+	<!--ajouté pour la map-->
+    <link rel="stylesheet"
+		  href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    	  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    	  crossorigin=""/>
+	
+	<!-- For the vue select -->
+	<link rel="stylesheet" href="https://unpkg.com/vue-select@3.0.0/dist/vue-select.css">
+	<!-- <script src="https://unpkg.com/vue-select@latest"></script> -->
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    		crossorigin=""></script>
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->	
+	<link href="https://code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css" rel="stylesheet"/>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.js" integrity="sha512-CX7sDOp7UTAq+i1FYIlf9Uo27x4os+kGeoT7rgwvY+4dmjqV0IuE/Bl5hVsjnQPQiTOhAX1O2r2j5bjsFBvv/A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script	src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"
+			integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+  	></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+	<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <!-- <script src="https://unpkg.com/vue2-leaflet"></script> -->
+    <!-- <script src="https://unpkg.com/vuex@latest/dist/vuex.js"></script> -->
+
+	<!-- Attention : call JQUERY BEFORE BOOTSTRAP -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+	<!-- Global variable : onServer -->
+	<script type="text/javascript" src="{%static 'js/global.js' %}"></script> 
+
+	<!-- Shortcut icon -->
+    <link rel="shortcut icon" href="{%static 'images/Icon_Vanheede.png' %}"/>
+</head>
+<body>
+	<!-- Navbar -->
+	<nav class="flex white" id="navbar"> 
+		<!-- Logo Vanheede -->
+		<a href={%url 'accueil'%} class="link-img"><img class="logo logo-vanheede" src="{%static 'images/logo_Vanheede.png' %}" alt="logo"></a>
+		
+		<!-- Liens navbar -->
+		<ul class="nav-links margin">
+			<li><a href={%url 'accueil'%} class="other-page-link" id="link-1">Accueil</a></li>
+			<li><a href={%url 'site'%} class="other-page-link" id="link-4">Sites et bulles</a></li>
+			<li><a href={%url 'simulation'%} class="other-page-link" id="link-5">Simulations</a></li>
+            <li><a href={%url 'tournees'%}  class="actual-page-link" id="link-6">Tournées</a></li>
+		</ul>
+		
+		<!-- Logo Umons -->
+		<img class="logo logo-umons" src="{%static 'images/logo_Umons.png' %}" alt="logo">
+
+		<!-- Menu mobile burger -->
+		<div class="burger">
+			<div class="line1"></div>
+			<div class="line2"></div>
+			<div class="line3"></div>
+		</div>
+	</nav>
+	
+	<div id="driver-app">
+		<!-- Title -->
+		<h3 class="title">Planning de tournées en cours</h3>
+
+		<!-- Simulation picker + calendar -->
+		<form class="date-picker">
+			<!-- Simulation picker -->
+			<center>
+				<div class="form-group colorwhite" style="display: inline-flex;" >
+					<label for="date" style="min-width: fit-content; margin-right: 10px;"> Choisissez une simulation : </label>
+					<select class="form-control col-md-6 " id="simu" @change="changeSimulation()" >
+						<option v-for="sim in simulations" :value=sim.id_simu>[[sim.nom]]</option>
+					</select>
+				</div>
+			</center>
+			<!-- Date picker -->
+			<section class="ftco-section">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="elegant-calencar d-md-flex white">
+								<div class="wrap-header d-flex align-items-center img" style="background-image: url({%static 'images/bg1.jpg' %});">
+							<p id="reset">Today</p>
+							<div id="header" class="p-0">
+										<!-- <div class="pre-button d-flex align-items-center justify-content-center"><i class="fa fa-chevron-left"></i></div> -->
+							<div class="head-info">
+								<div class="head-month"></div>
+								<div class="head-day"></div>
+							</div>
+							<!-- <div class="next-button d-flex align-items-center justify-content-center"><i class="fa fa-chevron-right"></i></div> -->
+							</div>
+						</div>
+						<div class="calendar-wrap">
+							<div class="dateDisplayed"></div>
+							<div class="w-100 button-wrap">
+								<div class="pre-button d-flex align-items-center justify-content-center" id="mybutton"><i class="fa fa-chevron-left"></i></div>
+								<div class="next-button d-flex align-items-center justify-content-center"><i class="fa fa-chevron-right"></i></div>
+							</div>
+							<a id='button' data-toggle="modal" data-target="#myModal">
+							<table id="calendar">
+							<thead>
+								<tr>
+									<th>Lun</th>
+									<th>Mar</th>
+									<th>Mer</th>
+									<th>Jeu</th>
+									<th>Ven</th>
+									<th>Sam</th>
+									<th>Dim</th>
+								</tr>
+							</thead>
+							<tbody>
+							<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							</tr>
+							<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							</tr>
+							<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							</tr>
+							<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							</tr>
+							<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							</tr>
+							<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							</tr>
+							</tbody>
+							</table>
+							</a>
+						</div>
+						</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+				<!-- Choose the simulation from the list by its name -->			
+		</form>
+		
+		
+		<!-- Modal -->
+		<div class="modal fade " id="myModal" role="dialog">
+		<div class="modal-dialog modal-dialog2">
+		
+			<!-- Modal content-->
+			<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Validation de la tournée</h5>
+				<!-- Validation of a tour -->
+						<form class="validate-trip">
+							<div class="justify-content-center">
+								<div class="text-center">
+									<!-- Validate button -->
+									<div id="validate-trip-button">
+										<button id = "Validationbutton" type="button" class="btn btn-success" style="width: max-content;" onclick="driver_app.validateTrip()">Valider la tournée</button>
+									</div>
+									<!-- Message of validation on page -->
+									<span id="validate-success">[[validated]]</span>
+								</div>
+							</div>	
+						</form>
+
+			</div>
+			<div class="modal-body modal-body2">
+            <div class="page-connexion ">
+                <div class = "container">
+	
+					<!-- Table of bottle banks planned to empty 
+					with option to add the state of the emptying -->
+					<div class="result-grid">
+						<div class ="white container2" id="planning">
+
+								<!-- Headers of table -->
+								<table class="table top bulles-wrapper">
+									<thead class="bulles-grid" id="sites-grid-title">
+										<tr>
+											<th class="bulles-title">ID</th>
+											<th class="bulles-title">Site</th>
+											<th class="bulles-title">Type</th>
+											<th class="bulles-title">Couleur</th>
+											<th class="bulles-title">Poids blanc</th>
+											<th class="bulles-title">Poids coloré</th>
+											<th class="bulles-title with">Bulles NON vidées</th>
+										</tr>
+									</thead>
+									<!-- Datas of bulles -->
+									<tbody class="bulles-grid" id="planning-body">
+										<tr v-for="bulle in tournee">
+											<th scope="row" class="bulles-data">[[bulle.id]]</th>
+											<td class="bulles-data">[[bulle.position]]</td>
+											<td class="bulles-data">[[bulle.type]]</td>
+											<td class="bulles-data">[[bulle.couleur]]</td>
+											<td> <input id="poidsbulle" type = "Number" class="bulles-data2" v-model=bulle.poidsB></td>
+											<td> <input id="poidsbulle" type = "Number" class="bulles-data2" v-model=bulle.poidsC></td>
+											<td class="bulles-data2"> <span v-if="bulle.status==1"><input type="checkbox" nssame="statut"></span> </td>
+										</tr>
+									</tbody>
+								</table>
+						<div class="row text-center">
+						<div class="col text-center">
+							<button class="a2" type="button" data-toggle="modal" data-target="#myModal2">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Recalculer la simulation</button>
+						</div>
+					</div>
+						</div>
+
+						<div class="urgent-box">
+							<h4>Bulles à vider en urgence</h4>
+							<div class="input-group mb-3">
+								<select  class="form-control" id="dangerBinName"  name="dangerBinName" size="1" >
+									<option value="" disabled selected hidden>Bulle urgente</option>
+									<option v-for="bulle in bulles" :value=bulle.num_bulle> [[bulle.num_bulle]], [[bulle.addresse]] </option>
+								</select>
+								<button type="button" class="btn ml-3 btn-outline-danger" onclick="driver_app.addDangerBin()">Ajouter bulle</button>
+							</div>
+							<div class="bins-danger" id="bins-danger">
+								
+							</div>
+							<div class="input-group justify-content-center">
+								<button type="button" class="btn mt-2 btn-outline-danger" onclick="driver_app.clearDangerBin()">Effacer la liste</button>
+							</div>
+							<h4 style = "padding-top: 10px; ">Bulles vidées supplémentaires</h4>
+							<div class="input-group mb-3">
+								<select  class="form-control" id="ajoutBinName"  name="ajoutBinName" size="1" >
+									<option value="" disabled selected hidden>Bulles vidées</option>
+									<option v-for="bulle in bulles" :value=bulle.num_bulle> [[bulle.num_bulle]], [[bulle.addresse]] </option>
+								</select>
+								<button type="button" class="btn ml-3 btn-outline-success" onclick="driver_app.addAjoutBin()">Ajouter bulle</button>
+							</div>
+							<div class="bins-ajout" id="bins-ajout">
+								
+							</div>
+							<div class="input-group justify-content-center">
+								<button type="button" class="btn mt-2 btn-outline-success" onclick="driver_app.clearAjoutBin()">Effacer la liste</button>
+							</div>
+						</div>
+					</div>
+
+			</div> 
+			</div>
+			
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+			</div>
+			
+			</div>
+		</div>	
+		</div>
+		
+		
+
+		<!-- Modal : to redo the simulation -->
+		<div class="modal fade padding back_black_transp" id="myModal2" role="dialog">
+		<div class="modal-dialog modal-dialog3">
+		
+			<!-- Modal content-->
+			<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Recalculer la simulation</h4>
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+			</div>
+			<div class="modal-body">
+				<p>Cette simulation prendra en compte les bulles urgentes à vider, les bulles supplémentaires vidées ainsi que les bulles non vidées lors de la tournée.</p>
+				<div class= "Titre">
+					<h2 class="titre"> Paramètres de la simulation </h2>
+				</div>
+				
+				<form>
+					<p style = "text-align: center; display: flex; flex-direction: column; align-items: center;">
+						<label class= "set-param" title="veuillez choisir le set de paramètres">Set de paramètres</label>
+						<select class="form-control3" size="1" @change="fetchParam($event)">
+							<option disabled selected hidden>Choisissez un set</option>
+							<!-- v-for : afficher une liste d’éléments en provenance d’un tableau de données lié au fichié index.js -->
+							<option v-for="paramSet in paramSets.slice().reverse()" :value=paramSet.id> [[paramSet.Nom]] </option>
+						</select>
+					</p>
+					<div style ="display: flex; flex-wrap: wrap; width: auto; justify-content: space-evenly; align-items: flex-end;">
+					
+					<p>
+						<label title="veuillez choisir le nom de la simulation">Nom</label>
+						<input class="form-control2" type="text" id="Nom" placeholder="Nom de la simulation" required v-model=selectedParams.Nom>
+					</p>
+					<p>
+						<span>Dépôt</span>
+						<select class="form-control2" @change="changeDepot" v-model="selectedDepot" id='depot' required>
+							<option value="Quévy">Quévy</option>
+							<option value="Dottignies">Dottignies</option>
+						</select>
+					</p>
+
+		
+					<p>
+						<span>Lieu de vidange</span>
+						<select class="form-control2" v-model="selectedVidange" id='vidange' v-html="optionsList" required></select>
+					</p>
+		
+					<p>
+						<label title="veuillez choisir le nombre de jours par semaine de la simulation"> Nombre de jours/semaine</label>
+						 <input class="form-control2" type="number" id="jours" min="1" required v-model=selectedParams.days>
+					</p>
+		
+					<p>
+						<label> Nombre de semaines</label>
+						<input class="form-control2" type="number" id="semaine" min="1" required v-model=selectedParams.weeks>
+					</p>
+		
+					<p>
+						<label title="veuillez choisir la date de début de la simulation"> Date de début</label>
+						<input class="form-control2" type="date" id="date-debut" required v-model=selectedParams.firstDay >
+					</p>
+		
+					<p>
+						<label>Nombre de camions 26 tonnes</label>
+						<input class="form-control2" type="number" id="petit" min="0" required v-model=selectedParams.petit>
+					</p>
+					<p>
+						<label>Nombre de camions 44 tonnes</label>
+						<input class="form-control2" type="number" id="grand" min="0" required v-model=selectedParams.grand>
+					</p>
+		
+					<p>
+						<label title="veuillez choisir le temps maximum par jour d'une tournée">Temps max (en heure)</label>
+						<input class="form-control2" type="number" id="temps" min="0" required v-model=selectedParams.Maxtime>
+					</p>
+		
+					<p style="display: none;">
+						<label title="Le mode remplissages aléatoires et capteur correspond à ...">Mode remplissages aléatoires et capteur</label> <!--A compléter-->
+						<select class="form-control2" id='spike' required v-model=selectedParams.spike>
+							<option value="Désactivé" selected>Désactivé</option>
+							<option value="Activé" disabled>Activé</option>
+						</select>
+					</p>
+		
+					<p>
+						<label title="veuillez choisir le pourcentage de remplissage des bulles lors des tournées">Limite de remplissage des bulles</label>
+						<input class="form-control2" type="number" step=".01" id="remplissage"  min="0" max="1" required v-model=selectedParams.remplissage>
+					</p>
+		
+					<p>
+						<label title="veuillez choisir le pourcentage de remplissage des camions lors des tournées">Pourcentage maximum de remplissage des camions</label>
+						<input class="form-control" id="remplissage-truck" required v-model=selectedParams.remplissageCamions>
+					</p>
+					<p style="display: none;">
+						<label title="veuillez choisir l'adaptation des camions en fonction de la quantité à ramasser">Mode camion adaptatifs</label>
+						<select class="form-control2" class="form-control2" id='mode' required v-model=selectedParams.mode>
+							<option value="Désactivé">Désactivé</option>
+							<option value="Activé" selected>Activé</option>
+						</select>
+					</p>
+
+					</div>
+
+					<div id ="restart-sim-button" style ="text-align : center">
+						<button id = "Restartbutton" type ="button" class="btn btn-success" onclick="driver_app.RestartSimulation()">Recalculer la simulation</button>
+					</div>
+					<div class="row justify-content-center">
+						<span id="restart-success">[[sim_success]]</span>
+					</div>
+
+				</form>
+			</div>
+			
+			<!-- <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div> -->
+			</div>
+		</div>	
+		</div>
+	</div>
+	
+	<script src="{%static 'js/nav.js' %}"></script>
+	<script src="{%static 'js/classes.js' %}"></script>
+	<script src="{%static 'js/tournees.js' %}"></script>
+	<script src="{%static 'js/jquery.min.js' %}"></script>
+</body>
+</html>

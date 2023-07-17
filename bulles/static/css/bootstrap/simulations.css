@@ -1,0 +1,189 @@
+body {
+	overflow-x: hidden;
+	background-image: url("../images/verre3.png");
+	background-size: contain;
+	background-position : 50% 20%;
+	color : white !important;
+}
+
+.white{
+	background : white;
+	box-shadow: 0 0 10px rgb(0 0 0);
+}
+.other-page-link:hover{
+	color:#006a2e;
+	text-decoration: underline;
+}
+.actual-page-link:hover{
+	color:#fbc304;
+	text-decoration: underline;
+}
+html{
+	overflow-x: hidden;
+}
+
+.date-picker{
+	margin: 40px 50px ;
+	font-size: 20px;
+}
+.title{
+	margin-top: 20px ;
+	color: #006a2e;	
+	text-align: center;
+	font-size: 28px;
+	font-weight: normal;
+}
+.result-grid{
+	display: grid;
+	grid-template-columns: 60% 1fr;
+	margin: 50px 3vw;
+}
+#mapTest{
+	height: 50vh;
+	width: 50vw;
+	margin-left: auto;
+	margin-right: auto;
+}
+.result-text{
+	margin: auto 10px;
+	color: #707070;
+}
+.result-text-block{
+	padding-left: 10px;
+	margin-top: 20px;
+	font-size: 18px;
+	line-height: 25px;
+	background : white;
+	box-shadow: 0 0 10px rgb(0 0 0);
+}
+.result-data{
+	margin: 5px 0px;
+}
+
+.transform-button{
+	background-color: #ffc700;
+	color: #fff;
+	padding: 	10px;
+	border: none;
+	font-size: 	14px;
+	margin : 0 auto;
+	display: inline-block;
+}
+.transform-button:hover{
+	cursor : pointer;
+}
+
+.event a {
+    background-color: #42B373 !important;
+    background-image :none !important;
+    color: #ffffff !important;
+}
+.driver-grid{
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	margin: 20px 10vw;
+}
+.driver{
+	width: 200px;
+	margin: 20px auto;
+	height:  20vh;
+	background : white;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+	overflow-y: scroll;
+}
+.driver-name{
+	margin: 6px 10px;
+	color: #707070;
+}
+.driver-bulles{
+	color: #414141;
+	margin: 0 15px 6px 15px;
+}
+@media screen and (max-width: 800px){
+	.result-grid{
+		grid-template-columns: 1fr;
+		margin: 20px 0px;
+	}
+	.driver-grid{
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		margin: 20px 10vw;
+	}
+	#mapTest{
+		width: 80vw;
+		margin-bottom: 30px;
+	}
+	.result-text{
+		margin: 0px 20vw;
+	}
+}
+@media screen and (max-width : 1300px) {
+	body {
+	background-size: cover;
+	}
+}
+.extract-data-button{
+	margin : 0;
+	background-color: transparent;
+	border: none;
+	display: inline-block;
+	
+	
+}
+.extract-data-button:hover{
+	margin : 0;
+	cursor : pointer;
+	border: none;
+	
+}
+
+
+svg {
+  margin : 0.5%;
+
+}
+
+.btn {
+	color: white; 
+	cursor: pointer;
+	 -webkit-tap-highlight-color: transparent;
+}
+
+.textbtn {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-font-smoothing: subpixel-antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.subCircle {
+  pointer-events: none;
+}
+
+.strokeW {
+  -webkit-animation: strokeW 0.6s forwards;
+          animation: strokeW 0.6s forwards;
+}
+@-webkit-keyframes strokeW {
+  to {
+    stroke-width: 1.16;
+  }
+}
+@keyframes strokeW {
+  to {
+    stroke-width: 1.16;
+  }
+}
+
+/* for the navbar */
+.flex {
+	display: flex;
+}
+.margin {
+	margin: 0;
+}
+.dateDisplayed {
+	color: black;
+}

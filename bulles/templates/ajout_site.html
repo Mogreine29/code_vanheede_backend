@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+    <title>Ajout de site</title>
+	
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    
+	 <!-- Global variable : onServer -->
+    <script type="text/javascript" src="{%static 'js/global.js' %}"></script> 
+
+    <!-- Shortcut icon -->
+    <link rel="shortcut icon" href="{%static 'images/Icon_Vanheede.png' %}"/>
+    <link rel="stylesheet" href="{%static 'css/ajout_site.css' %}" />
+</head>
+	<body>
+		<div id ="app"> 
+            <div class="shadowcss page-connexion  ">
+                <h1 class = "green" >Site </h1>
+
+				{% if submitted %}
+					Your site was submitted successfully!
+				{% endif %}
+			
+				
+			
+				<form action = "" method=POST>
+					<div class="formulaire" >
+					{{form.as_p}}
+					</div>
+					<input type="submit" value="Ajouter" class="btn margin-top fw-bold connexion-button">
+					<a href={%url 'site'%} class="btn margin-top fw-bold connexion-button"> Retour </a> 
+				</form>
+
+				 
+
+			</div>
+		</div> 
+	<script src="{%static 'js/index.js' %}"></script>
+	</body>
+</html>

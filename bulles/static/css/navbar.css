@@ -1,0 +1,133 @@
+*{
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: calibri;
+}
+
+nav{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	min-height: 50px;
+	box-shadow: 0px 0px 10px  #000000 ; 
+}
+
+ul{
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.logo{
+	height: 35px;
+	cursor: pointer;
+	display: block;
+	margin: 0px 2vh;
+}
+
+.nav-links{
+	display: flex;
+	justify-content: space-around;
+	width: 500px;
+	align-items: center;
+}
+
+.nav-links li{
+	list-style: None;
+}
+
+.actual-page-link{
+	font-size: 15px;
+	background-color: #006a2e;
+	color: #fff;
+	text-decoration: None;
+	padding: 17px 20px 17px 20px;
+	min-height: 5vh;
+}
+
+.other-page-link{
+	font-size: 15px;
+	color: #707070;
+	text-decoration: None;
+	padding: 17px 20px 17px 20px;
+	min-height: 5vh;
+}
+
+.other-page-link:hover{
+	background-color: #e3e3e3;
+}
+
+.burger{
+	display: None;
+	margin: 0px 2vh;
+	cursor: pointer;
+	background-color: transparent;
+}
+
+.burger div{
+	width: 25px;
+	height: 3px;
+	background-color: #707070;
+	margin: 3px;
+}
+/*
+@media screen and (max-width: 800px){
+	.nav-links{
+		width: 80%;
+	}
+	.logo-umons{
+		display: none;
+	}
+	.nav-links{
+		margin-right: 80px;
+	}
+}
+*/
+@media screen and (max-width: 850px){
+	.nav-links{
+		position: absolute;
+		right: 0px;
+		height: 90vh;
+		height: calc(100vh - 400px);
+		top: 50px;
+		margin: 0;
+		flex-direction: column;
+		width: 50%;
+		background-color: #e3e3e3;
+		display: none;
+		z-index: 999;  /*Rajouté par Rebecca*/
+	}
+	.nav-links a{
+		background-color: #e3e3e3;
+		color: #707070;
+		z-index: 999;  /*Rajouté par Rebecca*/
+	}
+	.nav-links a:hover{
+		background-color: #e3e3e3;
+		color: #707070;
+		z-index: 999;  /*Rajouté par Rebecca*/
+	}
+	.burger{
+		display: block;
+		z-index: 999;  /*Rajouté par Rebecca*/
+	}
+	nav{
+		box-shadow: none;
+		background-color: transparent;
+		z-index: 999;  /*Rajouté par Rebecca*/
+	}
+	.logo-vanheede{
+		z-index: 999;  /*Rajouté par Rebecca*/
+	}
+	.link-img{
+		background-color: transparent;
+		z-index: 999;  /*Rajouté par Rebecca*/
+	}
+	.logo-umons{
+		display: none;
+	}
+}
+
+.nav-active{
+	display: flex;
+}
